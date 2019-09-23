@@ -1,4 +1,4 @@
-package parser
+package request
 
 import (
 	"bufio"
@@ -8,19 +8,19 @@ import (
 	"sync"
 )
 
-type dbEventParser struct{}
+type requestDBEventPackageParser struct{}
 
-var parser *dbEventParser
+var parser *requestDBEventPackageParser
 var once sync.Once
 
-func DBEventParser() *dbEventParser {
+func RequestDBEventPackageParser() *requestDBEventPackageParser {
 	once.Do(func() {
-		parser = new(dbEventParser)
+		parser = new(requestDBEventPackageParser)
 	})
 	return parser
 }
 
-func (p *dbEventParser) Parse(inBuf *ringbuffer.RingBuffer) ([]*RequestDBEventPackage, error) {
+func (p *requestDBEventPackageParser) Parse(inBuf *ringbuffer.RingBuffer) ([]*RequestDBEventPackage, error) {
 	var err error
 	packages := []*RequestDBEventPackage{}
 	scanner := bufio.NewScanner(inBuf)
