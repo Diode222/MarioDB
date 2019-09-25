@@ -1,4 +1,4 @@
-package event
+package dbEvent
 
 type MethodType int
 

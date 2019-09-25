@@ -11,6 +11,8 @@ github.com/libp2p/go-reuseport v0.0.1/go.mod h1:jn6RmB1ufnQwl0Q1f+YxAj8isJgDCQza
 github.com/onsi/ginkgo v1.6.0/go.mod h1:lLunBs/Ym6LB5Z9jYTR76FiuTmxDTDusOGeTQH+WWjE=
 github.com/onsi/ginkgo v1.7.0/go.mod h1:lLunBs/Ym6LB5Z9jYTR76FiuTmxDTDusOGeTQH+WWjE=
 github.com/onsi/gomega v1.4.3/go.mod h1:ex+gbHU/CVuBBDIJjb2X0qEXbFg53c61hWP/1CpauHY=
+github.com/panjf2000/gnet v0.0.1-rc.4 h1:IQI+DwUQyCfjCjSt1nvD0BHdDVZo2ik31giLRw+GZys=
+github.com/panjf2000/gnet v0.0.1-rc.4/go.mod h1:N251s4H0wuPrB0ssD/D4ZQYOFJKZOwYxqIejzAodQqc=
 github.com/panjf2000/gnet v0.1.1 h1:paU+AdlJaNDjOpdmmPx+BjqBHzC/preQZ4oaqEaCH8c=
 github.com/panjf2000/gnet v0.1.1/go.mod h1:N251s4H0wuPrB0ssD/D4ZQYOFJKZOwYxqIejzAodQqc=
 github.com/pkg/errors v0.8.1 h1:iURUrRGxPUNPdy5/HRSm+Yj6okJ6UtLINN0Q9M4+h3I=

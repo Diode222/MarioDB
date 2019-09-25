@@ -1,11 +1,13 @@
-package event
+package dbEvent
+
+import "github.com/Diode222/MarioDB/parser/dbEventPackage/response"
 
 type DeleteEvent struct {
 	BasicInfo *BasicEventInfo
 	Key       []byte
 }
 
-func (e *DeleteEvent) Process() ([]byte, error) {
+func (e *DeleteEvent) Process() (*response.ResponseDBEventPackage, error) {
 	return nil, nil
 }
 

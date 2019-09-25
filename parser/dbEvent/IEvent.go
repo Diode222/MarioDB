@@ -1,9 +1,9 @@
 package dbEvent
 
-import "github.com/Diode222/MarioDB/parser/dbEvent/event"
+import "github.com/Diode222/MarioDB/parser/dbEventPackage/response"
 
 type DBEvent interface {
-	Process() ([]byte, error)
+	Process() (*response.ResponseDBEventPackage, error)
 
-	GetBasicEventInfo() *event.BasicEventInfo
+	GetBasicEventInfo() *BasicEventInfo
 }

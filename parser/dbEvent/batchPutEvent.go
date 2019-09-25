@@ -1,4 +1,6 @@
-package event
+package dbEvent
+
+import "github.com/Diode222/MarioDB/parser/dbEventPackage/response"
 
 type BatchPutEvent struct {
 	BasicInfo *BasicEventInfo
@@ -6,7 +8,7 @@ type BatchPutEvent struct {
 	Values    [][]byte
 }
 
-func (e *BatchPutEvent) Process() ([]byte, error) {
+func (e *BatchPutEvent) Process() (*response.ResponseDBEventPackage, error) {
 	return nil, nil
 }
 
