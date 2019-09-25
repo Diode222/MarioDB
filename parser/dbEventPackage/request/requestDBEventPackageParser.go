@@ -24,21 +24,21 @@ func (p *requestDBEventPackageParser) Parse(inBuf *ringbuffer.RingBuffer) ([]*Re
 	var err error
 	packages := []*RequestDBEventPackage{}
 	scanner := bufio.NewScanner(inBuf)
-	scanner.Split(scannerSplitVersion1)
+	scanner.Split(ScannerSplit)
 	for scanner.Scan() {
 		dbEventPack := new(RequestDBEventPackage)
 		err = dbEventPack.Unpack(bytes.NewReader(scanner.Bytes()))
 		if err != nil {
 			head, tail := inBuf.PreReadAll()
-			log.Printf("DBEventPackage parse failed, %s", string(append(head, tail...)))
+			log.Printf("requestDBEventPackageParser parse failed, %s", string(append(head, tail...)))
 			continue
 		}
-		//fmt.Println(string(dbEventPack.DBName))
+
 		packages = append(packages, dbEventPack)
 	}
 	if err = scanner.Err(); err != nil {
 		head, tail := inBuf.PreReadAll()
-		log.Printf("DBEventPackage parse failed, %s", string(append(head, tail...)))
+		log.Printf("requestDBEventPackageParser parse failed, %s", string(append(head, tail...)))
 	}
 	return packages, err
 }

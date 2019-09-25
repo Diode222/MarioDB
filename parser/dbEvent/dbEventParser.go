@@ -1,14 +1,13 @@
-package event
+package dbEvent
 
 import (
 	"errors"
 	"fmt"
-	"github.com/Diode222/MarioDB/parser/dbEvent"
 	"github.com/Diode222/MarioDB/parser/dbEventPackage/request"
 	"sync"
 )
 
-type dbEventParser struct {}
+type dbEventParser struct{}
 
 var parser *dbEventParser
 var once sync.Once
@@ -20,7 +19,7 @@ func DBEventParser() *dbEventParser {
 	return parser
 }
 
-func (p *dbEventParser) Parse(requestDBEventPackage *request.RequestDBEventPackage) (dbEvent.DBEvent, error) {
+func (p *dbEventParser) Parse(requestDBEventPackage *request.RequestDBEventPackage) (DBEvent, error) {
 	method := string(requestDBEventPackage.Method)
 	switch method {
 	case "OPEN":

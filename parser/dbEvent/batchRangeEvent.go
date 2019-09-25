@@ -1,4 +1,6 @@
-package event
+package dbEvent
+
+import "github.com/Diode222/MarioDB/parser/dbEventPackage/response"
 
 type BatchRangeEvent struct {
 	BasicInfo *BasicEventInfo
@@ -7,7 +9,7 @@ type BatchRangeEvent struct {
 	Limits [][]byte // Range contains this key
 }
 
-func (e *BatchRangeEvent) Process() ([]byte, error) {
+func (e *BatchRangeEvent) Process() (*response.ResponseDBEventPackage, error) {
 	return nil, nil
 }
 

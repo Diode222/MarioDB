@@ -1,11 +1,13 @@
-package event
+package dbEvent
+
+import "github.com/Diode222/MarioDB/parser/dbEventPackage/response"
 
 type BatchPrefixRangeEvent struct {
 	BasicInfo *BasicEventInfo
 	Prefixes  [][]byte
 }
 
-func (e *BatchPrefixRangeEvent) Process() ([]byte, error) {
+func (e *BatchPrefixRangeEvent) Process() (*response.ResponseDBEventPackage, error) {
 	return nil, nil
 }
 
