@@ -97,6 +97,7 @@ func ScannerSplit(data []byte, atEOF bool) (advance int, token []byte, err error
 		if len(data) >= requestDBEventPackageHeaderLength {
 			switch data[1] {
 			case '1': // version 1
+				log.Printf("version 1 case")
 				return scannerSplitVersion1(data, atEOF)
 			case '2':
 
@@ -108,8 +109,7 @@ func ScannerSplit(data []byte, atEOF bool) (advance int, token []byte, err error
 		}
 	}
 
-	log.Printf("Wrong client request protocol, data: %s", string(data))
-	return -1, nil, errors.New(fmt.Sprintf("Wrong client protocol, data: %s", data))
+	return -1, nil, nil
 }
 
 func scannerSplitVersion1(data []byte, atEOF bool) (advance int, token []byte, err error) {
@@ -134,6 +134,7 @@ func scannerSplitVersion1(data []byte, atEOF bool) (advance int, token []byte, e
 
 	totalLength := int(methodLength + DBNameLength + KeysLength + ValuesLength + StartsLength + LimitsLength + PrefixesLength + SettingsLength + ReservedLength + uint16(requestDBEventPackageHeaderLength))
 	if totalLength <= len(data) {
+		log.Printf("totallength: %d, data length: %d", totalLength, len(data))
 		return totalLength, data[:totalLength], nil
 	}
 

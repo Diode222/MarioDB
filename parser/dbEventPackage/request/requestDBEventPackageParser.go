@@ -36,9 +36,6 @@ func (p *requestDBEventPackageParser) Parse(inBuf *ringbuffer.RingBuffer) ([]*Re
 
 		packages = append(packages, dbEventPack)
 	}
-	if err = scanner.Err(); err != nil {
-		head, tail := inBuf.PreReadAll()
-		log.Printf("requestDBEventPackageParser parse failed, %s", string(append(head, tail...)))
-	}
+
 	return packages, err
 }

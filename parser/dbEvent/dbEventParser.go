@@ -25,7 +25,7 @@ func (p *dbEventParser) Parse(requestDBEventPackage *request.RequestDBEventPacka
 	case "OPEN":
 		return openEventParse(requestDBEventPackage)
 	case "GET":
-
+		return &GetEvent{}, nil
 	case "BATCHGET":
 
 	case "PUT":
@@ -46,7 +46,7 @@ func (p *dbEventParser) Parse(requestDBEventPackage *request.RequestDBEventPacka
 
 	case "BATCHPREFIXRANGE":
 
-	default:
-		return nil, errors.New(fmt.Sprintf("Undefined event method: %s", method))
 	}
+
+	return nil, errors.New(fmt.Sprintf("Undefined event method: %s", method))
 }

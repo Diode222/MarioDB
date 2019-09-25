@@ -48,7 +48,7 @@ func (l *listener) Init() {
 	flag.Parse()
 
 	var dbEventsListener gnet.Events
-	dbEventsListener.Multicore = true
+	dbEventsListener.NumLoops = int(loops)
 
 	dbEventsListener.OnInitComplete = func(srv gnet.Server) (action gnet.Action) {
 		log.Printf("MarioDB server started on tcp://%s.", srv.Addrs)
@@ -80,15 +80,19 @@ func (l *listener) Init() {
 	}
 
 	dbEventsListener.React = func(c gnet.Conn, inBuf *ringbuffer.RingBuffer) (out []byte, action gnet.Action) {
+		head, tail := inBuf.PreReadAll()
+		dbEventSourceMessage := append(head, tail...)
+		log.Printf("DB source request messages: %s, messages size: %d", string(dbEventSourceMessage), len(dbEventSourceMessage))
+
 		packages, err := request.RequestDBEventPackageParser().Parse(inBuf)
 		if err != nil {
 			log.Print(err)
 		}
 
-		head, tail := inBuf.PreReadAll()
-		inBuf.Reset()
-		dbEventSourceMessage := append(head, tail...)
-		log.Printf("DB source request messages: %s", string(dbEventSourceMessage))
+		for _, p := range packages {
+			fmt.Println(string(p.Version[0]) + string(p.Version[1]))
+			fmt.Println(string(p.Keys))
+		}
 
 		out = response(packages)
 
