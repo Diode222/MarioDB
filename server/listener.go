@@ -3,7 +3,6 @@ package server
 import (
 	"flag"
 	"fmt"
-	"github.com/Diode222/MarioDB/parser/dbEvent/event"
 	"github.com/Diode222/MarioDB/parser/dbEventPackage/request"
 	"github.com/panjf2000/gnet"
 	"github.com/panjf2000/gnet/ringbuffer"
@@ -80,36 +79,18 @@ func (l *listener) Init() {
 		return
 	}
 
-	// TODO Split the logic of this function
 	dbEventsListener.React = func(c gnet.Conn, inBuf *ringbuffer.RingBuffer) (out []byte, action gnet.Action) {
 		packages, err := request.RequestDBEventPackageParser().Parse(inBuf)
 		if err != nil {
 			log.Print(err)
 		}
 
-		var wg sync.WaitGroup
-		for _, p := range packages {
-			wg.Add(1)
-			go func(p *request.RequestDBEventPackage) {
-				dbEvent, err := event.DBEventParser().Parse(p)
-				if err != nil {
-					log.Print(err)
-				}
-				responseData, err := dbEvent.Process()
-				if err != nil {
-					log.Print(err)
-				}
-				// TODO Response "responseData" to client
-
-				wg.Done()
-			}(p)
-		}
-		wg.Wait()
-
 		head, tail := inBuf.PreReadAll()
 		inBuf.Reset()
 		dbEventSourceMessage := append(head, tail...)
 		log.Printf("DB source request messages: %s", string(dbEventSourceMessage))
+
+		out = response(packages)
 
 		return
 	}
