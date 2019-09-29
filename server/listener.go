@@ -1,6 +1,7 @@
 package server
 
 import (
+	"bytes"
 	"flag"
 	"fmt"
 	"github.com/Diode222/MarioDB/parser/dbEventPackage/request"
@@ -11,6 +12,8 @@ import (
 	"sync"
 	"time"
 )
+
+var buffer *bytes.Buffer = bytes.NewBuffer(nil)
 
 type listener struct {
 	IP        string
@@ -57,7 +60,6 @@ func (l *listener) Init() {
 
 	dbEventsListener.OnOpened = func(c gnet.Conn) (out []byte, opts gnet.Options, action gnet.Action) {
 		log.Printf("Client started on tcp://%s.", c.RemoteAddr())
-		out = []byte("TCP has connected.")
 		return
 	}
 
@@ -83,10 +85,20 @@ func (l *listener) Init() {
 		head, tail := inBuf.PreReadAll()
 		dbEventSourceMessage := append(head, tail...)
 		log.Printf("DB source request messages: %s, messages size: %d", string(dbEventSourceMessage), len(dbEventSourceMessage))
+		inBuf.Reset()
 
-		packages, err := request.RequestDBEventPackageParser().Parse(inBuf)
+		buffer.Write(dbEventSourceMessage)
+
+		fmt.Println("bytes:" + string(buffer.Bytes()))
+		packages, consumeBytesLength, err := request.RequestDBEventPackageParser().Parse(buffer)
 		if err != nil {
 			log.Print(err)
+		}
+		var consumed []byte = make([]byte, consumeBytesLength, consumeBytesLength)
+		_, err = buffer.Read(consumed)
+		if err != nil {
+			buffer = bytes.NewBuffer(nil)
+			log.Printf("Reset the length of buffer failed, consumeBytesLength: %d, buffer length: %d", consumeBytesLength, len(buffer.Bytes()))
 		}
 
 		for _, p := range packages {
@@ -94,7 +106,9 @@ func (l *listener) Init() {
 			fmt.Println(string(p.Keys))
 		}
 
-		out = response(packages)
+		dataResponse := response(packages)
+		fmt.Println("response: " + string(dataResponse))
+		out = dataResponse
 
 		return
 	}

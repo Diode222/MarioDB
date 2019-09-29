@@ -92,12 +92,15 @@ func (p *RequestDBEventPackage) Unpack(reader io.Reader) error {
 	return err
 }
 
+func (p *RequestDBEventPackage) TotalLength() int {
+	return int(uint16(requestDBEventPackageHeaderLength) + p.MethodLength + p.DBNameLength + p.KeysLength + p.ValuesLength + p.StartsLength + p.LimitsLength + p.PrefixesLength + p.SettingsLength + p.ReservedLength)
+}
+
 func ScannerSplit(data []byte, atEOF bool) (advance int, token []byte, err error) {
 	if !atEOF && len(data) >= 2 && data[0] == 'V' && data[1] >= '1' && data[1] <= '9' {
 		if len(data) >= requestDBEventPackageHeaderLength {
 			switch data[1] {
 			case '1': // version 1
-				log.Printf("version 1 case")
 				return scannerSplitVersion1(data, atEOF)
 			case '2':
 
