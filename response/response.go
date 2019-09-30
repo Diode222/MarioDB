@@ -25,25 +25,25 @@ func Response(packages []*request.RequestDBEventPackage) []byte {
 			defer wg.Done()
 			eventObj, err := eventInfo.EventParser().Parse(p)
 			if err != nil {
-				log.Printf("Protocol error")
-				protocolErrorDataBinary := responseErrors.ProtocolError(p.Version)
+				log.Printf(err.Error())
+				protocolErrorDataBinary := responseErrors.ResponseErrorBinary(p.Version, []byte(err.Error()))
 				responseDataSyncObj.Lock.Lock()
 				responseDataSyncObj.Data = append(responseDataSyncObj.Data, protocolErrorDataBinary...)
 				responseDataSyncObj.Lock.Unlock()
 				return
 			}
 
-			responseData, err := eventObj.Process()
+			responsePackage, err := eventObj.Process()
 			if err != nil {
-				log.Printf("Protocol error")
-				protocolErrorDataBinary := responseErrors.ProtocolError(p.Version)
+				log.Printf(err.Error())
+				protocolErrorDataBinary := responseErrors.ResponseErrorBinary(p.Version, []byte(err.Error()))
 				responseDataSyncObj.Lock.Lock()
 				responseDataSyncObj.Data = append(responseDataSyncObj.Data, protocolErrorDataBinary...)
 				responseDataSyncObj.Lock.Unlock()
 				return
 			}
 
-			responseDataBinary, err := responseData.PackToBinary()
+			responseDataBinary, err := responsePackage.PackToBinary()
 			if err != nil {
 				log.Print(err)
 				wg.Done()

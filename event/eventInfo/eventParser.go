@@ -23,8 +23,8 @@ func EventParser() *eventParser {
 func (p *eventParser) Parse(requestDBEventPackage *request.RequestDBEventPackage) (event.Event, error) {
 	method := string(requestDBEventPackage.Method)
 	switch method {
-	case "OPEN":
-		return openEventParse(requestDBEventPackage)
+	case "CREATE":
+		return createEventParse(requestDBEventPackage)
 	case "GET":
 		return &GetEvent{}, nil
 	case "BATCHGET":
