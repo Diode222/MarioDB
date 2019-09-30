@@ -1,29 +1,30 @@
-package dbEvent
+package eventInfo
 
 import (
 	"errors"
 	"fmt"
-	"github.com/Diode222/MarioDB/parser/dbEventPackage/request"
+	"github.com/Diode222/MarioDB/dbEventPackage/request"
+	"github.com/Diode222/MarioDB/event"
 	"sync"
 )
 
-type dbEventParser struct{}
+type eventParser struct{}
 
-var parser *dbEventParser
+var parser *eventParser
 var once sync.Once
 
-func DBEventParser() *dbEventParser {
+func EventParser() *eventParser {
 	once.Do(func() {
-		parser = new(dbEventParser)
+		parser = new(eventParser)
 	})
 	return parser
 }
 
-func (p *dbEventParser) Parse(requestDBEventPackage *request.RequestDBEventPackage) (DBEvent, error) {
+func (p *eventParser) Parse(requestDBEventPackage *request.RequestDBEventPackage) (event.Event, error) {
 	method := string(requestDBEventPackage.Method)
 	switch method {
-	case "OPEN":
-		return openEventParse(requestDBEventPackage)
+	case "CREATE":
+		return createEventParse(requestDBEventPackage)
 	case "GET":
 		return &GetEvent{}, nil
 	case "BATCHGET":

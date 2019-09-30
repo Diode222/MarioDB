@@ -1,9 +1,12 @@
-package dbEvent
+package eventInfo
 
-import "github.com/Diode222/MarioDB/parser/dbEventPackage/response"
+import (
+	"github.com/Diode222/MarioDB/dbEventPackage/response"
+	"github.com/Diode222/MarioDB/event"
+)
 
 type GetEvent struct {
-	BasicInfo *BasicEventInfo
+	BasicInfo *event.BasicEventInfo
 	Key       []byte
 }
 
@@ -21,6 +24,6 @@ func (e *GetEvent) Process() (*response.ResponseDBEventPackage, error) {
 	}, nil
 }
 
-func (e *GetEvent) GetBasicEventInfo() *BasicEventInfo {
+func (e *GetEvent) GetBasicEventInfo() *event.BasicEventInfo {
 	return e.BasicInfo
 }

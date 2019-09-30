@@ -4,7 +4,8 @@ import (
 	"bytes"
 	"flag"
 	"fmt"
-	"github.com/Diode222/MarioDB/parser/dbEventPackage/request"
+	"github.com/Diode222/MarioDB/dbEventPackage/request"
+	"github.com/Diode222/MarioDB/response"
 	"github.com/panjf2000/gnet"
 	"github.com/panjf2000/gnet/ringbuffer"
 	"io"
@@ -15,19 +16,19 @@ import (
 
 var buffer *bytes.Buffer = bytes.NewBuffer(nil)
 
-type listener struct {
+type server struct {
 	IP        string
-	Port      uint64
+	Port      uint
 	ReusePort bool
-	Loops     uint64
+	Loops     uint
 }
 
-var l *listener
+var l *server
 var once sync.Once
 
-func Listener(ip string, port uint64, reusePort bool, loops uint64) *listener {
+func NewServer(ip string, port uint, reusePort bool, loops uint) *server {
 	once.Do(func() {
-		l = &listener{
+		l = &server{
 			IP:        ip,
 			Port:      port,
 			ReusePort: reusePort,
@@ -37,42 +38,42 @@ func Listener(ip string, port uint64, reusePort bool, loops uint64) *listener {
 	return l
 }
 
-func (l *listener) Init() {
+func (l *server) Init() {
 	var ip string
-	var port uint64
+	var port uint
 	var reusePort bool
-	var loops uint64
+	var loops uint
 	var transportLayerProtocol string = "tcp"
 
-	flag.StringVar(&ip, "ip", l.IP, "Server ip")
-	flag.Uint64Var(&port, "port", l.Port, "Server port")
-	flag.BoolVar(&reusePort, "reusePort", l.ReusePort, "Reuse listener port in cluster")
-	flag.Uint64Var(&loops, "loops", l.Loops, "Loops number the server is using")
+	flag.StringVar(&ip, "ip", l.IP, "NewServer ip")
+	flag.UintVar(&port, "port", l.Port, "NewServer port")
+	flag.BoolVar(&reusePort, "reusePort", l.ReusePort, "Reuse server port in cluster")
+	flag.UintVar(&loops, "loops", l.Loops, "Loops number the server is using")
 	flag.Parse()
 
-	var dbEventsListener gnet.Events
-	dbEventsListener.NumLoops = int(loops)
+	var tcpEventsServer gnet.Events
+	tcpEventsServer.NumLoops = int(loops)
 
-	dbEventsListener.OnInitComplete = func(srv gnet.Server) (action gnet.Action) {
+	tcpEventsServer.OnInitComplete = func(srv gnet.Server) (action gnet.Action) {
 		log.Printf("MarioDB server started on tcp://%s.", srv.Addrs)
 		return
 	}
 
-	dbEventsListener.OnOpened = func(c gnet.Conn) (out []byte, opts gnet.Options, action gnet.Action) {
+	tcpEventsServer.OnOpened = func(c gnet.Conn) (out []byte, opts gnet.Options, action gnet.Action) {
 		log.Printf("Client started on tcp://%s.", c.RemoteAddr())
 		return
 	}
 
-	dbEventsListener.OnClosed = func(c gnet.Conn, err error) (action gnet.Action) {
+	tcpEventsServer.OnClosed = func(c gnet.Conn, err error) (action gnet.Action) {
 		log.Printf("Client(Address: %s) closed connection.", c.RemoteAddr())
 		return
 	}
 
-	dbEventsListener.OnDetached = func(c gnet.Conn, rwc io.ReadWriteCloser) (action gnet.Action) {
-		log.Printf("Server detached connection of client(Address: %s).", c.RemoteAddr())
-		_, err := rwc.Write([]byte(fmt.Sprintf("Server(Address: %s) detached connection.", c.LocalAddr())))
+	tcpEventsServer.OnDetached = func(c gnet.Conn, rwc io.ReadWriteCloser) (action gnet.Action) {
+		log.Printf("NewServer detached connection of client(Address: %s).", c.RemoteAddr())
+		_, err := rwc.Write([]byte(fmt.Sprintf("NewServer(Address: %s) detached connection.", c.LocalAddr())))
 		if err != nil {
-			log.Printf("Server detached info send failed. Client address: %s", c.RemoteAddr())
+			log.Printf("NewServer detached info send failed. Client address: %s", c.RemoteAddr())
 		}
 		err = rwc.Close()
 		if err != nil {
@@ -81,7 +82,7 @@ func (l *listener) Init() {
 		return
 	}
 
-	dbEventsListener.React = func(c gnet.Conn, inBuf *ringbuffer.RingBuffer) (out []byte, action gnet.Action) {
+	tcpEventsServer.React = func(c gnet.Conn, inBuf *ringbuffer.RingBuffer) (out []byte, action gnet.Action) {
 		head, tail := inBuf.PreReadAll()
 		dbEventSourceMessage := append(head, tail...)
 		log.Printf("DB source request messages: %s, messages size: %d", string(dbEventSourceMessage), len(dbEventSourceMessage))
@@ -106,19 +107,19 @@ func (l *listener) Init() {
 			fmt.Println(string(p.Keys))
 		}
 
-		dataResponse := response(packages)
-		fmt.Println("response: " + string(dataResponse))
+		dataResponse := response.Response(packages)
+		log.Printf("response: %s", string(dataResponse))
 		out = dataResponse
 
 		return
 	}
 
-	dbEventsListener.Tick = func() (delay time.Duration, action gnet.Action) {
+	tcpEventsServer.Tick = func() (delay time.Duration, action gnet.Action) {
 		return
 	}
 
-	err := gnet.Serve(dbEventsListener, fmt.Sprintf("%s://%s:%d", transportLayerProtocol, ip, port))
+	err := gnet.Serve(tcpEventsServer, fmt.Sprintf("%s://%s:%d", transportLayerProtocol, ip, port))
 	if err != nil {
-		log.Fatalf("Server start failed, address: tcp://%s:%d", ip, port)
+		log.Fatalf("NewServer start failed, address: tcp://%s:%d", ip, port)
 	}
 }
