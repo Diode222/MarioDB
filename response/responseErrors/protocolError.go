@@ -5,7 +5,7 @@ import (
 	"log"
 )
 
-func ProtocolError(version [2]byte) []byte {
+func ResponseErrorBinary(version [2]byte, errBytes []byte) []byte {
 	var protocolErrorPackage *response.ResponseDBEventPackage = &response.ResponseDBEventPackage{
 		Version:        version,
 		StatusLength:   5,
@@ -18,9 +18,8 @@ func ProtocolError(version [2]byte) []byte {
 		Reserved:       nil,
 	}
 
-	errString := []byte("Protocol error")
-	protocolErrorPackage.ErrorLength = uint16(len(errString))
-	protocolErrorPackage.Error = errString
+	protocolErrorPackage.ErrorLength = uint16(len(errBytes))
+	protocolErrorPackage.Error = errBytes
 	errDataBinary, err := protocolErrorPackage.PackToBinary()
 	if err != nil {
 		log.Print(err)

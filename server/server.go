@@ -18,15 +18,15 @@ var buffer *bytes.Buffer = bytes.NewBuffer(nil)
 
 type server struct {
 	IP        string
-	Port      uint64
+	Port      uint
 	ReusePort bool
-	Loops     uint64
+	Loops     uint
 }
 
 var l *server
 var once sync.Once
 
-func NewServer(ip string, port uint64, reusePort bool, loops uint64) *server {
+func NewServer(ip string, port uint, reusePort bool, loops uint) *server {
 	once.Do(func() {
 		l = &server{
 			IP:        ip,
@@ -40,15 +40,15 @@ func NewServer(ip string, port uint64, reusePort bool, loops uint64) *server {
 
 func (l *server) Init() {
 	var ip string
-	var port uint64
+	var port uint
 	var reusePort bool
-	var loops uint64
+	var loops uint
 	var transportLayerProtocol string = "tcp"
 
 	flag.StringVar(&ip, "ip", l.IP, "NewServer ip")
-	flag.Uint64Var(&port, "port", l.Port, "NewServer port")
+	flag.UintVar(&port, "port", l.Port, "NewServer port")
 	flag.BoolVar(&reusePort, "reusePort", l.ReusePort, "Reuse server port in cluster")
-	flag.Uint64Var(&loops, "loops", l.Loops, "Loops number the server is using")
+	flag.UintVar(&loops, "loops", l.Loops, "Loops number the server is using")
 	flag.Parse()
 
 	var tcpEventsServer gnet.Events
