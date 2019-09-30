@@ -1,7 +1,7 @@
 package responseErrors
 
 import (
-	"github.com/Diode222/MarioDB/parser/dbEventPackage/response"
+	"github.com/Diode222/MarioDB/dbEventPackage/response"
 	"log"
 )
 

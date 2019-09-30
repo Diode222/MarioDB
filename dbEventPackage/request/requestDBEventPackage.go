@@ -9,7 +9,7 @@ import (
 	"log"
 )
 
-// header length: 38 bytes
+// header length: 20 bytes
 var requestDBEventPackageHeaderLength int = 20
 
 // all keys, values and starts..., will seperated by

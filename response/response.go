@@ -1,9 +1,9 @@
-package server
+package response
 
 import (
-	"github.com/Diode222/MarioDB/parser/dbEvent"
-	"github.com/Diode222/MarioDB/parser/dbEventPackage/request"
-	"github.com/Diode222/MarioDB/responseErrors"
+	"github.com/Diode222/MarioDB/dbEventPackage/request"
+	"github.com/Diode222/MarioDB/event/eventInfo"
+	"github.com/Diode222/MarioDB/response/responseErrors"
 	"log"
 	"sync"
 )
@@ -13,7 +13,7 @@ type responseDataSync struct {
 	Data []byte
 }
 
-func response(packages []*request.RequestDBEventPackage) []byte {
+func Response(packages []*request.RequestDBEventPackage) []byte {
 	responseDataSyncObj := &responseDataSync{
 		Lock: sync.RWMutex{},
 		Data: []byte{},
@@ -22,25 +22,24 @@ func response(packages []*request.RequestDBEventPackage) []byte {
 	for _, p := range packages {
 		wg.Add(1)
 		go func(p *request.RequestDBEventPackage) {
-			dbEventObj, err := dbEvent.DBEventParser().Parse(p)
+			defer wg.Done()
+			eventObj, err := eventInfo.EventParser().Parse(p)
 			if err != nil {
 				log.Printf("Protocol error")
 				protocolErrorDataBinary := responseErrors.ProtocolError(p.Version)
 				responseDataSyncObj.Lock.Lock()
 				responseDataSyncObj.Data = append(responseDataSyncObj.Data, protocolErrorDataBinary...)
 				responseDataSyncObj.Lock.Unlock()
-				wg.Done()
 				return
 			}
 
-			responseData, err := dbEventObj.Process()
+			responseData, err := eventObj.Process()
 			if err != nil {
 				log.Printf("Protocol error")
 				protocolErrorDataBinary := responseErrors.ProtocolError(p.Version)
 				responseDataSyncObj.Lock.Lock()
 				responseDataSyncObj.Data = append(responseDataSyncObj.Data, protocolErrorDataBinary...)
 				responseDataSyncObj.Lock.Unlock()
-				wg.Done()
 				return
 			}
 
@@ -54,8 +53,6 @@ func response(packages []*request.RequestDBEventPackage) []byte {
 			responseDataSyncObj.Lock.Lock()
 			responseDataSyncObj.Data = append(responseDataSyncObj.Data, responseDataBinary...)
 			responseDataSyncObj.Lock.Unlock()
-
-			wg.Done()
 		}(p)
 	}
 	wg.Wait()
