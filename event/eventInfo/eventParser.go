@@ -34,19 +34,15 @@ func (p *eventParser) Parse(requestDBEventPackage *request.RequestDBEventPackage
 	case "BATCHPUT":
 		return batchPutEventParse(requestDBEventPackage)
 	case "DELETE":
-
+		return deleteEventParse(requestDBEventPackage)
 	case "BATCHDELETE":
-
+		return batchDeleteEventParse(requestDBEventPackage)
 	case "RANGE":
-
-	case "BATCHRANGE":
-
+		return rangeEventParse(requestDBEventPackage)
 	case "SEEKRANGE":
-
+		return seekRangeEventParse(requestDBEventPackage)
 	case "PREFIXRANGE":
-
-	case "BATCHPREFIXRANGE":
-
+		return prefixRangeEventParse(requestDBEventPackage)
 	}
 
 	return nil, errors.New(fmt.Sprintf("Undefined event method: %s", method))
