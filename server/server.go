@@ -14,6 +14,7 @@ import (
 	"time"
 )
 
+// TODO This buffer should be managed by a map, key is client, value is buffer, when client closed, buffer should be removed.
 var buffer *bytes.Buffer = bytes.NewBuffer(nil)
 
 type server struct {

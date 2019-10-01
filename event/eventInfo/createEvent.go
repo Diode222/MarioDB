@@ -9,7 +9,6 @@ import (
 	"github.com/Diode222/MarioDB/manager"
 	"github.com/Diode222/MarioDB/utils"
 	"github.com/syndtr/goleveldb/leveldb"
-	"log"
 )
 
 type CreateEvent struct {
@@ -17,12 +16,28 @@ type CreateEvent struct {
 }
 
 func (e *CreateEvent) Process() (*response.ResponseDBEventPackage, error) {
+	var db *leveldb.DB
+	var ok bool
 	dbName := e.GetBasicEventInfo().DBName
+
+	// The current process can only have one reference globally, so if the db is existed, response OK directly.
+	if db, ok = manager.DBManger.Get(dbName); ok {
+		return &response.ResponseDBEventPackage{
+			Version:        [2]byte{'V', '1'},
+			StatusLength:   2,
+			ErrorLength:    0,
+			ValuesLength:   0,
+			ReservedLength: 0,
+			Status:         []byte("OK"),
+			Error:          nil,
+			Values:         nil,
+			Reserved:       nil,
+		}, nil
+	}
+
 	db, err := leveldb.OpenFile(utils.GetAbsoluteOfDB(dbName), nil)
 	if err != nil {
-		//The current process can only have one reference globally, repeatedly open will return error!
-		log.Printf("DB %s create failed, maybe this db has created", e.GetBasicEventInfo().DBName)
-		return nil, errors.New(fmt.Sprintf("Create db failed, dbname: %s, maybe this db has created", dbName))
+		return nil, errors.New(fmt.Sprintf("Create db failed, dbname: %s", dbName))
 	}
 	manager.DBManger.Add(dbName, db)
 

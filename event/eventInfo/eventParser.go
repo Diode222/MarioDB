@@ -30,7 +30,7 @@ func (p *eventParser) Parse(requestDBEventPackage *request.RequestDBEventPackage
 	case "BATCHGET":
 		return batchGetEventParse(requestDBEventPackage)
 	case "PUT":
-
+		return putEventParse(requestDBEventPackage)
 	case "BATCHPUT":
 
 	case "DELETE":
