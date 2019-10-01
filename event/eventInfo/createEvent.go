@@ -6,6 +6,7 @@ import (
 	"github.com/Diode222/MarioDB/dbEventPackage/request"
 	"github.com/Diode222/MarioDB/dbEventPackage/response"
 	"github.com/Diode222/MarioDB/event"
+	"github.com/Diode222/MarioDB/manager"
 	"github.com/Diode222/MarioDB/utils"
 	"github.com/syndtr/goleveldb/leveldb"
 	"log"
@@ -22,7 +23,7 @@ func (e *CreateEvent) Process() (*response.ResponseDBEventPackage, error) {
 		log.Printf("DB %s create failed.", e.GetBasicEventInfo().DBName)
 		return nil, errors.New(fmt.Sprintf("Open db failed, dbname: %s", dbName))
 	}
-	defer db.Close()
+	manager.DBManger.Add(dbName, db)
 
 	return &response.ResponseDBEventPackage{
 		Version:        [2]byte{'V', '1'},
