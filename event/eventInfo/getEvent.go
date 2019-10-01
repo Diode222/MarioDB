@@ -22,12 +22,12 @@ func (e *GetEvent) Process() (*response.ResponseDBEventPackage, error) {
 	var ok bool
 
 	if db, ok = manager.DBManger.Get(dbName); !ok {
-		return nil, errors.New(fmt.Sprintf("No such db, dbName: %s", dbName))
+		return nil, errors.New(fmt.Sprintf("No such opened db, dbName: %s", dbName))
 	}
 
 	value, err := db.Get(key, nil)
 	if err != nil {
-		return nil, errors.New(fmt.Sprintf("No such key in db, key: %s, dbName: %s", string(key), dbName))
+		return nil, errors.New(fmt.Sprintf("No such key, key: %s, dbName: %s", string(key), dbName))
 	}
 
 	return &response.ResponseDBEventPackage{

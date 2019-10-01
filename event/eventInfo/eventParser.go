@@ -34,18 +34,14 @@ func (p *eventParser) Parse(requestDBEventPackage *request.RequestDBEventPackage
 	case "BATCHPUT":
 		return batchPutEventParse(requestDBEventPackage)
 	case "DELETE":
-
+		return deleteEventParse(requestDBEventPackage)
 	case "BATCHDELETE":
-
+		return batchDeleteEventParse(requestDBEventPackage)
 	case "RANGE":
-
-	case "BATCHRANGE":
-
+		return rangeEventParse(requestDBEventPackage)
 	case "SEEKRANGE":
 
 	case "PREFIXRANGE":
-
-	case "BATCHPREFIXRANGE":
 
 	}
 

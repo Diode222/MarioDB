@@ -25,7 +25,7 @@ func (e *BatchGetEvent) Process() (*response.ResponseDBEventPackage, error) {
 	var ok bool
 
 	if db, ok = manager.DBManger.Get(dbName); !ok {
-		return nil, errors.New(fmt.Sprintf("No such db, dbName: %s", dbName))
+		return nil, errors.New(fmt.Sprintf("No such opened db, dbName: %s", dbName))
 	}
 
 	ok = false
@@ -45,7 +45,7 @@ func (e *BatchGetEvent) Process() (*response.ResponseDBEventPackage, error) {
 	}
 
 	if !ok {
-		return nil, errors.New(fmt.Sprintf("No such keys in db, keys: %s, dbName: %s", e.Keys, dbName))
+		return nil, errors.New(fmt.Sprintf("No such keys, keys: %s, dbName: %s", e.Keys, dbName))
 	}
 
 	return &response.ResponseDBEventPackage{

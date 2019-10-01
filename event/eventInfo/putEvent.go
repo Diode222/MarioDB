@@ -22,12 +22,12 @@ func (e *PutEvent) Process() (*response.ResponseDBEventPackage, error) {
 	var ok bool
 
 	if db, ok = manager.DBManger.Get(dbName); !ok {
-		return nil, errors.New(fmt.Sprintf("No such db, dbName: %s", dbName))
+		return nil, errors.New(fmt.Sprintf("No such opened db, dbName: %s", dbName))
 	}
 
 	err := db.Put(e.Key, e.Value, nil)
 	if err != nil {
-		return nil, errors.New(fmt.Sprintf("PUT failed to db, dbName: %s, err: %s, key: %s, values: %s", dbName, err.Error(), e.Key, e.Value))
+		return nil, errors.New(fmt.Sprintf("PUT failed, dbName: %s, err: %s, key: %s, values: %s", dbName, err.Error(), e.Key, e.Value))
 	}
 
 	return &response.ResponseDBEventPackage{

@@ -23,7 +23,7 @@ func (e *BatchPutEvent) Process() (*response.ResponseDBEventPackage, error) {
 	var ok bool
 
 	if db, ok = manager.DBManger.Get(dbName); !ok {
-		return nil, errors.New(fmt.Sprintf("No such db, dbName: %s", dbName))
+		return nil, errors.New(fmt.Sprintf("No such opened db, dbName: %s", dbName))
 	}
 
 	if len(e.Keys) != len(e.Values) {
@@ -36,7 +36,7 @@ func (e *BatchPutEvent) Process() (*response.ResponseDBEventPackage, error) {
 	}
 	err := db.Write(batch, nil)
 	if err != nil {
-		return nil, errors.New(fmt.Sprintf("Batch put failed, keys: %s, values: %s", e.Keys, e.Values))
+		return nil, errors.New(fmt.Sprintf("Batch put failed, keys: %s, values: %s, dbName: %s", e.Keys, e.Values, dbName))
 	}
 
 	return &response.ResponseDBEventPackage{
