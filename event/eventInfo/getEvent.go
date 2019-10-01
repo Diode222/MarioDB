@@ -27,7 +27,7 @@ func (e *GetEvent) Process() (*response.ResponseDBEventPackage, error) {
 
 	value, err := db.Get(key, nil)
 	if err != nil {
-		return nil, errors.New(fmt.Sprintf("No such key/value pair in db, key: %s, value: %s", string(key), dbName))
+		return nil, errors.New(fmt.Sprintf("No such key in db, key: %s, dbName: %s", string(key), dbName))
 	}
 
 	return &response.ResponseDBEventPackage{

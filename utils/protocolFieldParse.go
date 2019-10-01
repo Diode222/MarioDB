@@ -1,9 +1,15 @@
 package utils
 
-import "strings"
+import (
+	"github.com/Diode222/MarioDB/global"
+	"strings"
+)
 
-var SEPARATOR string = "##"
-
-func ProtocolFieldParse(field string) []string {
-	return strings.Split(field, SEPARATOR)
+func ProtocolFieldParse(field []byte) [][]byte {
+	fieldStrSlice := strings.Split(string(field), global.DB_FIELD_SEPARATOR)
+	fields := [][]byte{}
+	for _, fieldStr := range fieldStrSlice {
+		fields = append(fields, []byte(fieldStr))
+	}
+	return fields
 }
