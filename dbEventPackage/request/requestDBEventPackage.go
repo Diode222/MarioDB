@@ -6,7 +6,6 @@ import (
 	"errors"
 	"fmt"
 	"io"
-	"log"
 )
 
 // header length: 20 bytes
@@ -137,7 +136,6 @@ func scannerSplitVersion1(data []byte, atEOF bool) (advance int, token []byte, e
 
 	totalLength := int(methodLength + DBNameLength + KeysLength + ValuesLength + StartLength + LimitLength + PrefixLength + SettingsLength + ReservedLength + uint16(requestDBEventPackageHeaderLength))
 	if totalLength <= len(data) {
-		log.Printf("totallength: %d, data length: %d", totalLength, len(data))
 		return totalLength, data[:totalLength], nil
 	}
 

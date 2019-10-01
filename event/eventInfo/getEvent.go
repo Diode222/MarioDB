@@ -17,7 +17,6 @@ type GetEvent struct {
 
 func (e *GetEvent) Process() (*response.ResponseDBEventPackage, error) {
 	dbName := e.BasicInfo.DBName
-	key := e.Key
 	var db *leveldb.DB
 	var ok bool
 
@@ -25,9 +24,9 @@ func (e *GetEvent) Process() (*response.ResponseDBEventPackage, error) {
 		return nil, errors.New(fmt.Sprintf("No such opened db, dbName: %s", dbName))
 	}
 
-	value, err := db.Get(key, nil)
+	value, err := db.Get(e.Key, nil)
 	if err != nil {
-		return nil, errors.New(fmt.Sprintf("No such key, key: %s, dbName: %s", string(key), dbName))
+		return nil, errors.New(fmt.Sprintf("No such key, key: %s, dbName: %s", string(e.Key), dbName))
 	}
 
 	return &response.ResponseDBEventPackage{

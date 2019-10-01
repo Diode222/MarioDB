@@ -36,13 +36,21 @@ func (e *RangeEvent) GetBasicEventInfo() *event.BasicEventInfo {
 }
 
 func rangeEventParse(requestDBEventPackage *request.RequestDBEventPackage) (event.Event, error) {
+	var start []byte
+	var limit []byte
+	if len(requestDBEventPackage.Start) > 0 {
+		start = requestDBEventPackage.Start
+	}
+	if len(requestDBEventPackage.Limit) > 0 {
+		limit = requestDBEventPackage.Limit
+	}
 	return &RangeEvent{
 		BasicInfo: &event.BasicEventInfo{
 			Method: event.RANGE,
 			DBName: string(requestDBEventPackage.DBName),
 		},
-		Start: requestDBEventPackage.Start,
-		Limit: requestDBEventPackage.Limit,
+		Start: start,
+		Limit: limit,
 	}, nil
 }
 

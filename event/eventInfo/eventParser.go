@@ -40,9 +40,9 @@ func (p *eventParser) Parse(requestDBEventPackage *request.RequestDBEventPackage
 	case "RANGE":
 		return rangeEventParse(requestDBEventPackage)
 	case "SEEKRANGE":
-
+		return seekRangeEventParse(requestDBEventPackage)
 	case "PREFIXRANGE":
-
+		return prefixRangeEventParse(requestDBEventPackage)
 	}
 
 	return nil, errors.New(fmt.Sprintf("Undefined event method: %s", method))
