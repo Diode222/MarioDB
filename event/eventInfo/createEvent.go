@@ -20,8 +20,9 @@ func (e *CreateEvent) Process() (*response.ResponseDBEventPackage, error) {
 	dbName := e.GetBasicEventInfo().DBName
 	db, err := leveldb.OpenFile(utils.GetAbsoluteOfDB(dbName), nil)
 	if err != nil {
-		log.Printf("DB %s create failed.", e.GetBasicEventInfo().DBName)
-		return nil, errors.New(fmt.Sprintf("Open db failed, dbname: %s", dbName))
+		//The current process can only have one reference globally, repeatedly open will return error!
+		log.Printf("DB %s create failed, maybe this db has created", e.GetBasicEventInfo().DBName)
+		return nil, errors.New(fmt.Sprintf("Create db failed, dbname: %s, maybe this db has created", dbName))
 	}
 	manager.DBManger.Add(dbName, db)
 
