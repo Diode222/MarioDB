@@ -21,7 +21,6 @@ type BatchGetEvent struct {
 func (e *BatchGetEvent) Process() (*response.ResponseDBEventPackage, error) {
 	values := []byte{}
 	dbName := e.BasicInfo.DBName
-	keys := e.Keys
 	var db *leveldb.DB
 	var ok bool
 
@@ -30,10 +29,10 @@ func (e *BatchGetEvent) Process() (*response.ResponseDBEventPackage, error) {
 	}
 
 	ok = false
-	for index, key := range keys {
+	for index, key := range e.Keys {
 		value := []byte{}
 		var err error
-		if index != len(keys) - 1 {
+		if index != len(e.Keys)-1 {
 			value, err = db.Get(key, nil)
 			value = append(value, []byte(global.DB_FIELD_SEPARATOR)...)
 		} else {
@@ -46,7 +45,7 @@ func (e *BatchGetEvent) Process() (*response.ResponseDBEventPackage, error) {
 	}
 
 	if !ok {
-		return nil, errors.New(fmt.Sprintf("No such keys in db, keys: %s, dbName: %s", keys, dbName))
+		return nil, errors.New(fmt.Sprintf("No such keys in db, keys: %s, dbName: %s", e.Keys, dbName))
 	}
 
 	return &response.ResponseDBEventPackage{
