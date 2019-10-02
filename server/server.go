@@ -2,7 +2,6 @@ package server
 
 import (
 	"bytes"
-	"flag"
 	"fmt"
 	"github.com/Diode222/MarioDB/dbEventPackage/request"
 	"github.com/Diode222/MarioDB/manager"
@@ -43,20 +42,10 @@ func NewServer(ip string, port uint, reusePort bool, loops uint) *server {
 }
 
 func (l *server) Init() {
-	var ip string
-	var port uint
-	var reusePort bool
-	var loops uint
 	var transportLayerProtocol string = "tcp"
 
-	flag.StringVar(&ip, "ip", l.IP, "NewServer ip")
-	flag.UintVar(&port, "port", l.Port, "NewServer port")
-	flag.BoolVar(&reusePort, "reusePort", l.ReusePort, "Reuse server port in cluster")
-	flag.UintVar(&loops, "loops", l.Loops, "Loops number the server is using")
-	flag.Parse()
-
 	var tcpEventsServer gnet.Events
-	tcpEventsServer.NumLoops = int(loops)
+	tcpEventsServer.NumLoops = int(l.Loops)
 
 	tcpEventsServer.OnInitComplete = func(srv gnet.Server) (action gnet.Action) {
 		log.Printf("MarioDB server started on tcp://%s.", srv.Addrs)
@@ -141,8 +130,8 @@ func (l *server) Init() {
 		return
 	}
 
-	err := gnet.Serve(tcpEventsServer, fmt.Sprintf("%s://%s:%d", transportLayerProtocol, ip, port))
+	err := gnet.Serve(tcpEventsServer, fmt.Sprintf("%s://%s:%d", transportLayerProtocol, l.IP, l.Port))
 	if err != nil {
-		log.Fatalf("NewServer start failed, address: tcp://%s:%d", ip, port)
+		log.Fatalf("NewServer start failed, address: %s://%s:%d", transportLayerProtocol, l.IP, l.Port)
 	}
 }
