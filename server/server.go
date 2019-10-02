@@ -132,6 +132,6 @@ func (l *server) Init() {
 
 	err := gnet.Serve(tcpEventsServer, fmt.Sprintf("%s://%s:%d", transportLayerProtocol, l.IP, l.Port))
 	if err != nil {
-		log.Fatalf("NewServer start failed, address: %s://%s:%d", transportLayerProtocol, l.IP, l.Port)
+		log.Fatalf("Server start failed, address: %s://%s:%d, err: %s", transportLayerProtocol, l.IP, l.Port, err.Error())
 	}
 }

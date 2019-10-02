@@ -11,10 +11,10 @@ import (
 
 func main() {
 	//global.DB_ROOT_PATH = "/home/diode/levelDB_database_root/"
-	defaultDBPath, _ := os.Getwd()
+	defaultDBPath := os.Getenv("HOME")
 	dbPath := flag.String("dbPath", defaultDBPath, "Database's data path")
 	ip := flag.String("ip", "127.0.0.1", "IP")
-	port := flag.Uint("port", 50000, "Port")
+	port := flag.Uint("port", 45555, "Port")
 	dbLRUCacheMaxCount := flag.Uint("dbLRUMax", 100, "Max count of db caches in LRU")
 	maxClientCount := flag.Uint("maxClient", 100, "Max count of connected clients")
 	needHelp := flag.Bool("h", false, "Help")
@@ -41,7 +41,7 @@ func main() {
 func printHelpInfo(defaultDBPath string) {
 	fmt.Println("Usage:")
 	fmt.Println("    -ip           string    IP                              (Default: 127.0.0.1)")
-	fmt.Println("    -port         string    Port                            (Default: 50000)")
+	fmt.Println("    -port         string    Port                            (Default: 45555)")
 	fmt.Println("    -dbPath       string    Database's data path            (Default: " + defaultDBPath + ")")
 	fmt.Println("    -maxClient    string    Max count of connected clients  (Default: 100)")
 	fmt.Println("    -dbLRUMax     string    Max count of db caches in LRU   (Default: 100)")
