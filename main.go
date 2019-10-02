@@ -11,7 +11,7 @@ import (
 
 func main() {
 	//global.DB_ROOT_PATH = "/home/diode/levelDB_database_root/"
-	defaultDBPath, _ := os.Getwd()
+	defaultDBPath := os.Getenv("HOME")
 	dbPath := flag.String("dbPath", defaultDBPath, "Database's data path")
 	ip := flag.String("ip", "127.0.0.1", "IP")
 	port := flag.Uint("port", 50000, "Port")
