@@ -11,8 +11,8 @@ type dbManger struct {
 	cache *lru.Cache
 }
 
-var manager *dbManger
-var once sync.Once
+var dbM *dbManger
+var dbMangerOnce sync.Once
 
 func NewDBManger(maxCacheCount uint) *dbManger {
 	lru, err := lru.New(int(maxCacheCount))
@@ -20,12 +20,12 @@ func NewDBManger(maxCacheCount uint) *dbManger {
 		log.Printf("Init cache cache failed, maxCacheCount: %d", maxCacheCount)
 		panic(err)
 	}
-	once.Do(func() {
-		manager = &dbManger{
+	dbMangerOnce.Do(func() {
+		dbM = &dbManger{
 			cache: lru,
 		}
 	})
-	return manager
+	return dbM
 }
 
 func (m *dbManger) Clear() {

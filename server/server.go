@@ -5,7 +5,10 @@ import (
 	"flag"
 	"fmt"
 	"github.com/Diode222/MarioDB/dbEventPackage/request"
+	"github.com/Diode222/MarioDB/manager"
 	"github.com/Diode222/MarioDB/response"
+	"github.com/Diode222/MarioDB/response/responseErrors"
+	"github.com/Diode222/MarioDB/response/responseOK"
 	"github.com/panjf2000/gnet"
 	"github.com/panjf2000/gnet/ringbuffer"
 	"io"
@@ -62,6 +65,13 @@ func (l *server) Init() {
 
 	tcpEventsServer.OnOpened = func(c gnet.Conn) (out []byte, opts gnet.Options, action gnet.Action) {
 		log.Printf("Client started on tcp://%s.", c.RemoteAddr())
+		err := manager.ClientManger.Add(c)
+		if err != nil {
+			action = gnet.Close
+			out = responseErrors.ResponseErrorBinary([2]byte{'V', '1'}, []byte(err.Error()))
+		} else {
+			out = responseOK.ResponseOKBinary([2]byte{'V', '1'})
+		}
 		return
 	}
 
@@ -84,28 +94,40 @@ func (l *server) Init() {
 	}
 
 	tcpEventsServer.React = func(c gnet.Conn, inBuf *ringbuffer.RingBuffer) (out []byte, action gnet.Action) {
+		fmt.Println("remote addr: ", c.RemoteAddr())
 		head, tail := inBuf.PreReadAll()
 		dbEventSourceMessage := append(head, tail...)
 		log.Printf("DB source request messages: %s, messages size: %d", string(dbEventSourceMessage), len(dbEventSourceMessage))
 		inBuf.Reset()
 
-		buffer.Write(dbEventSourceMessage)
+		client, ok := manager.ClientManger.Get(c.RemoteAddr().String())
+		if !ok {
+			manager.ClientManger.Remove(c.RemoteAddr().String())
+			out = responseErrors.ResponseErrorBinary([2]byte{'V', '1'}, []byte("Connection has closed."))
+			action = gnet.Close
+			return
+		}
 
-		fmt.Println("bytes:" + string(buffer.Bytes()))
-		packages, consumeBytesLength, err := request.RequestDBEventPackageParser().Parse(buffer)
+		err := client.Write(dbEventSourceMessage)
+		if err != nil {
+			client.ClearBuffer()
+			log.Printf("Write dbEventSourceMessage to buffer failed, dbEventSourceMessage: %s, client addr: %s", dbEventSourceMessage, c.RemoteAddr())
+		}
+
+		packages, consumeBytesLength, err := request.RequestDBEventPackageParser().Parse(client.GetBuffer())
 		if err != nil {
 			log.Print(err)
 		}
-		var consumed []byte = make([]byte, consumeBytesLength, consumeBytesLength)
-		_, err = buffer.Read(consumed)
+		err = client.DiscardConsumedBuffer(consumeBytesLength)
 		if err != nil {
-			buffer = bytes.NewBuffer(nil)
-			log.Printf("Reset the length of buffer failed, consumeBytesLength: %d, buffer length: %d", consumeBytesLength, len(buffer.Bytes()))
+			client.ClearBuffer()
+			log.Printf("Reset the length of buffer by consuming failed, consumeBytesLength: %d, buffer length: %d", consumeBytesLength, len(buffer.Bytes()))
 		}
 
 		for _, p := range packages {
-			fmt.Println(string(p.Version[0]) + string(p.Version[1]))
+			fmt.Println(string(p.Method))
 			fmt.Println(string(p.Keys))
+			fmt.Println(string(p.Values))
 		}
 
 		dataResponse := response.Response(packages)
